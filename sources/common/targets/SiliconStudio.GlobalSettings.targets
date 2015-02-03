@@ -62,7 +62,7 @@
 
   
   <PropertyGroup Condition=" '$(SiliconStudioPlatform)' == 'Android' ">
-    <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <SiliconStudioPlatformDefines>SILICONSTUDIO_PLATFORM_MONO;SILICONSTUDIO_PLATFORM_MONO_MOBILE;SILICONSTUDIO_PLATFORM_ANDROID;NET45</SiliconStudioPlatformDefines>
     <AndroidSupportedAbis>armeabi-v7a%3barmeabi%3bx86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
@@ -130,12 +130,16 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   
-  <!--
-    Signing
-  -->
+  <!-- Signing -->
+  <PropertyGroup Condition=" '$(SiliconStudioOpenSourceSign)' == 'true'">
+    <SiliconStudioSign>true</SiliconStudioSign>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(SiliconStudioAssemblySign)' == 'true' And '$(SiliconStudioSign)' == 'true'">
     <DefineConstants>$(DefineConstants);SILICONSTUDIO_SIGNED</DefineConstants>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)paradox.snk</AssemblyOriginatorKeyFile>
+    <DelaySign Condition="'$(SiliconStudioOpenSourceSign)' == 'true'">true</DelaySign>
+    <AssemblyOriginatorKeyFile Condition="'$(SiliconStudioOpenSourceSign)' != 'true'">$(SolutionDir)paradox.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile Condition="'$(SiliconStudioOpenSourceSign)' == 'true'">$(SolutionDir)paradox.public.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
 </Project>

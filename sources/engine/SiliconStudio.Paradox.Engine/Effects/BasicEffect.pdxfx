@@ -3,32 +3,8 @@
 using SiliconStudio.Paradox.Effects.Data;
 using SiliconStudio.Paradox.Shaders.Compiler;
 
-namespace ParadoxEffects
+namespace SiliconStudio.Paradox.Effects
 {
-    partial shader WithSkinning
-    {
-        using params MaterialParameters;
-        using params CompilerParameters;
-
-        mixin clone;
-        if (MaterialParameters.HasSkinningPosition)
-        {
-            if (MaterialParameters.SkinningBones > MaterialParameters.SkinningMaxBones)
-            {
-                // TODO: We should use next power of two minus constant to limit shader permutations?
-                MaterialParameters.SkinningMaxBones = MaterialParameters.SkinningBones;
-            }
-            mixin macro MaterialParameters.SkinningMaxBones;
-            mixin TransformationSkinning;
-         
-            if (MaterialParameters.HasSkinningNormal)
-                mixin NormalSkinning;
-
-            if (MaterialParameters.HasSkinningTangent)
-                mixin TangentSkinning;
-        }
-    };
-
     shader BasicEffect
     {
         using params RenderingParameters;
@@ -38,8 +14,20 @@ namespace ParadoxEffects
               
         mixin ShaderBase;
         mixin TransformationWAndVP;
-        mixin NormalVSStream;
+
         mixin PositionVSStream;
+
+        var hasNormals = MaterialParameters.NormalMap != null;
+        if (hasNormals)
+        {
+            mixin NormalMapTexture;
+            mixin compose normalMap = MaterialParameters.NormalMap;
+        }
+        else
+        {
+            mixin NormalVSStream;
+        }
+
         mixin BRDFDiffuseBase;
         mixin BRDFSpecularBase;
         mixin LightMultiDirectionalShadingPerPixel<2>;
@@ -69,6 +57,28 @@ namespace ParadoxEffects
             }
         }
 
-        mixin child WithSkinning;
+        if (MaterialParameters.HasSkinningPosition)
+        {
+            if (MaterialParameters.SkinningBones > MaterialParameters.SkinningMaxBones)
+            {
+                // TODO: We should use next power of two minus constant to limit shader permutations?
+                MaterialParameters.SkinningMaxBones = MaterialParameters.SkinningBones;
+            }
+            mixin macro MaterialParameters.SkinningMaxBones;
+            mixin TransformationSkinning;
+         
+            if (MaterialParameters.HasSkinningNormal)
+            {
+                if (hasNormals)
+                    mixin TangentToViewSkinning;
+                else
+                    mixin NormalVSSkinning;
+
+                mixin NormalSkinning;
+            }
+
+            if (MaterialParameters.HasSkinningTangent)
+                mixin TangentSkinning;
+        }
     };
 }

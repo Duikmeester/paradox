@@ -36,18 +36,27 @@ namespace SiliconStudio.Paradox.Assets.Materials.Nodes
         /// <summary>
         /// The operation to blend the nodes.
         /// </summary>
+        /// <userdoc>
+        /// The operation between the background (LeftChild) and the foreground (RightChild).
+        /// </userdoc>
         [DataMember(10)]
         public MaterialBinaryOperand Operand { get; set; }
 
         /// <summary>
         /// The left (background) child node.
         /// </summary>
+        /// <userdoc>
+        /// The background color mapping.
+        /// </userdoc>
         [DataMember(20)]
         public IMaterialNode LeftChild { get; set; }
 
         /// <summary>
         /// The right (foreground) child node.
         /// </summary>
+        /// <userdoc>
+        /// The foreground color mapping.
+        /// </userdoc>
         [DataMember(30)]
         public IMaterialNode RightChild { get; set; }
 
@@ -58,6 +67,12 @@ namespace SiliconStudio.Paradox.Assets.Materials.Nodes
             	yield return new MaterialNodeEntry(LeftChild, node => LeftChild = node);
             if (RightChild != null)
            	yield return new MaterialNodeEntry(RightChild, node => RightChild = node);
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return "Binary operation";
         }
     }
 }
